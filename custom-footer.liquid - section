@@ -1,0 +1,328 @@
+first create a section named   "custom-footer.liquid"
+
+<style>
+  footer{
+    background-color:{{section.settings.bgcolor}};
+    padding:{{section.settings.padding}}px;
+  }
+  .container{
+  max-width:1400px;
+  margin:auto;
+  
+  }
+  .flex{
+  display:flex;
+   flex-wrap:wrap;
+  }
+  .col{
+  flex:0 25%;
+  max-width:25%;
+  padding:15px 5px;
+  }
+  .col-4{
+  flex:0 25%;
+  max-width:25%;
+  padding:15px 5px;
+  }
+  
+  
+  .site-footer__social-icons {
+    padding-top: 7.5px;
+    text-align: left;
+}
+  .social-icons__item {
+    padding-left: 0;
+    padding-right:15px;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+ @media screen and (max-width: 425px){
+    .site-footer__linklist-item {
+    display: block;
+    padding: 2px 0; 
+    font-size: 12px;
+      
+}
+   footer {
+    padding: 10px;
+     color:white;
+}
+   .input-group__btn .btn, .input-group__btn .shopify-payment-button .shopify-payment-button__button--unbranded, .shopify-payment-button .input-group__btn .shopify-payment-button__button--unbranded {
+  
+    font-size: 11px;
+    padding: 5px;
+}
+   
+   
+  }
+</style>
+
+<footer>
+  <div class="container">
+    <div  class="flex">
+      {% for block in section.blocks %}
+      
+     
+        {% case block.type %}
+   
+        
+        
+        {%when "text"%}
+      <div class= "col">
+        {%if block.settings.heading %}
+         <h4>{{block.settings.heading}}</h4>
+        	{% endif %}
+        	<div>
+        	  <h5>Mobile Number</h5>
+        	  <p>{{ block.settings.phone }}</p>
+         	  <h5>Email Address</h5>
+         	 <p>{{ block.settings.email }}</p>
+        	</div>
+     </div>
+        
+        
+        
+        {%when "social"%}
+       
+       <div class= "col">
+        {%if block.settings.heading %}
+         <h4>{{block.settings.heading}}</h4>
+        {% endif %}
+        {%if block.settings.check%}
+         	{% include "footer-social" %}
+        {% endif %}
+        
+      </div>
+        {%when "newsletter"%}
+       <div class= "col-4">
+        {%if block.settings.heading %}
+         <h4>{{block.settings.heading}}</h4>
+        {% endif %}
+        <div class="site-footer__newsletter
+                          {% if section.blocks.size == 1 %} site-footer__single-block--centered{% endif %}">
+                  {%- assign formId = 'ContactFooter' -%}
+                  {% form 'customer', id: formId, novalidate: 'novalidate' %}
+                    {%- if form.posted_successfully? -%}
+                      <p class="form-message form-message--success" tabindex="-1" data-form-status>
+                        {{ 'general.newsletter_form.confirmation' | t }}
+                      </p>
+                    {%- endif -%}
+                    <input type="hidden" name="contact[tags]" value="newsletter">
+                    <div class="input-group {% if form.errors %} input-group--error{% endif %}">
+                      <input type="email"
+                        name="contact[email]"
+                        id="{{ formId }}-email"
+                        class="input-group__field newsletter__input{% if form.errors %} input--error{% endif %}"
+                        value="{{ form.email }}"
+                        placeholder="{{ 'general.newsletter_form.email_placeholder' | t }}"
+                        aria-label="{{ 'general.newsletter_form.email_placeholder' | t }}"
+                        aria-required="true"
+                        required
+                        autocorrect="off"
+                        autocapitalize="off"
+                        {% if form.errors %}
+                          aria-invalid="true"
+                          aria-describedby="{{ formId }}-email-error"
+                          data-form-status
+                        {% endif %}>
+                      <span class="input-group__btn">
+                        <button type="submit" class="btn newsletter__submit" name="commit" >
+                          <span class="newsletter__submit-text--large">{{ 'general.newsletter_form.submit' | t }}</span>
+                        </button>
+                      </span>
+                    </div>
+                    {% if form.errors contains 'email' %}
+                      <span id="{{ formId }}-email-error" class="input-error-message">
+                        <span class="visually-hidden">{{ 'general.accessibility.error' | t }} </span>
+                        {% include 'icon-error' %}
+                        <span class="site-footer__newsletter-error">{{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}.</span>
+                      </span>
+                    {% endif %}
+                  {% endform %}
+                </div>
+        
+      </div>
+        
+        {%when "text_block"%}
+      <div class="col-4">
+        <div class="logo">
+          <a href="./">
+            <img src="{{block.settings.logo | img_url: '150x150'}}" alt="Footer Logo">
+          </a>
+          <p>{{block.settings.text}}</p>
+         </div>
+      </div>
+        
+        
+        {%when "link_list" %}
+       <div class= "col">
+        {%if block.settings.heading %}
+         <h4>{{block.settings.heading}}</h4>
+        {% endif %}
+         {% assign link= block.settings.menu %}
+         <ul class="site-footer__linklist
+               {% if inline_list %}list--inline{% endif %}">
+                  {%- for link in linklists[link].links -%}
+                      <li class="site-footer__linklist-item">
+                        <a href="{{ link.url }}"
+                          {% if link.current %} aria-current="page"{% endif %}
+                        >
+                          {{ link.title | escape }}
+                        </a>
+                      </li>
+                 {%- endfor -%}
+            </ul>
+      </div>
+        
+          {% endcase%}
+        
+     
+     
+      {% endfor%}
+      
+     
+    
+    </div>
+  </div>
+</footer>
+
+
+{% schema %}
+  {
+    "name": "Footer Section",
+	"max_blocks":5,
+    "settings": [
+{
+"type":"color",
+"id":"bgcolor",
+"label":"Background Color"
+},
+{
+"type":"range",
+"id":"padding",
+"min":20,
+"max":100,
+"default":30,
+"step":10,
+
+"label":"Padding Range"
+}
+
+ 	],
+
+"blocks":[
+	{
+        "type":"text_block",
+        "name":"Text Block",
+        "settings":[
+            {
+              "type":"image_picker",
+              "id":"logo",
+              "label":"Add Logo"
+
+            },
+            {
+              "type":"richtext",
+              "id":"text",
+              "label":"Add Description"
+            }
+
+        ]
+
+	},
+{
+"type":"newsletter",
+"name":"Newsletter",
+"limit":1,
+"settings":[
+         {
+            "type":"text",
+            "id":"heading",
+            "label":"Add Heading",
+			"info":"To get subscription use this option",
+			"default":"Newsletter"
+          },
+			{
+              "type":"richtext",
+              "id":"text",
+              "label":"Add Description"
+            }
+]
+},
+            {
+            "type":"link_list",
+            "name":"Add menu",
+            "settings":[
+                  {
+
+                   "type":"text",
+                   "id":"heading",
+                   "label":"Add Heading"
+                  },
+                  {
+
+                   "type":"link_list",
+                   "id":"menu",
+                   "label":"Add Menu"
+                  }
+
+                  ]
+            },
+	{
+            "type":"social",
+            "name":"Social Icon",
+            "settings":[
+                  {
+
+                   "type":"text",
+                   "id":"heading",
+                   "label":"Add Heading"
+                  },
+                  {
+
+                   "type":"checkbox",
+                   "id":"check",
+                   "label":"Display Social Link"
+                  }
+
+                  ]
+            },
+		 {
+            "type":"text",
+            "name":"Contact Info",
+            "settings":[
+                  {
+
+                   "type":"text",
+                   "id":"heading",
+                   "label":"Add Heading",
+					"default":"Our Contact Info"
+                  },
+                  {
+
+                   "type":"text",
+                   "id":"phone",
+                   "label":"Add Phone Number"
+                  },
+				{
+
+                   "type":"text",
+                   "id":"email",
+                   "label":"Add email Address"
+                  }
+				
+
+                  ]
+            }
+
+	]
+
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}
+
